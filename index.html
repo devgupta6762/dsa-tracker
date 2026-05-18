@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSA Master Tracker Dashboard</title>
+    <title>DSA Interactive Master Studio - Company Edition</title>
     <style>
         :root {
             --bg-primary: #f8fafc;
@@ -14,7 +13,6 @@
             --border-color: #e2e8f0;
             --accent-blue: #2563eb;
             --accent-blue-light: #eff6ff;
-            
             --state-none: #cbd5e1;
             --state-red: #ef4444;
             --state-yellow: #f59e0b;
@@ -22,249 +20,112 @@
         }
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 16px;
             line-height: 1.5;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1350px; margin: 0 auto; }
 
         header {
             background: var(--panel-bg);
-            padding: 24px;
+            padding: 20px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
             margin-bottom: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        h1 {
-            margin: 0 0 8px 0;
-            font-size: 28px;
-            color: #1e3a8a;
+        h1 { margin: 0 0 4px 0; font-size: 26px; color: #1e3a8a; }
+        .subtitle { color: var(--text-muted); margin: 0 0 16px 0; font-size: 14px; }
+
+        .calendar-box { background: #f1f5f9; border-radius: 8px; padding: 12px; margin-bottom: 20px; border: 1px solid var(--border-color); }
+        .calendar-title { font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 8px; text-transform: uppercase; }
+        .calendar-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+        .day-badge {
+            font-size: 11px; font-weight: 600; padding: 4px 6px; border-radius: 4px; background: #fff;
+            border: 1px solid var(--border-color); color: #475569; cursor: pointer; text-align: center; min-width: 55px;
         }
+        .day-badge.active-linear { border-color: #3b82f6; background: #e0f2fe; color: #0369a1; }
+        .day-badge.active-framework { border-color: #f59e0b; background: #fef3c7; color: #b45309; }
+        .day-badge.active-tree { border-color: #10b981; background: #d1fae5; color: #047857; }
+        .day-badge.active-adv { border-color: #8b5cf6; background: #ede9fe; color: #6d28d9; }
+        .day-badge.completed { background: #10b981 !important; color: white !important; border-color: #10b981; }
 
-        .subtitle {
-            color: var(--text-muted);
-            margin: 0 0 20px 0;
-            font-size: 15px;
-        }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 12px; }
+        .metric-card { background: var(--panel-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
+        .metric-val { font-size: 20px; font-weight: 700; }
+        .metric-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }
 
-        /* Metrics Grid */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-        }
+        .phase-title { font-size: 18px; font-weight: 700; color: #1e40af; margin: 32px 0 12px 0; border-bottom: 2px solid #d9e6f7; padding-bottom: 4px; }
+        .pattern-card { background: var(--panel-bg); border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); overflow: hidden; }
+        .pattern-header { background: #f8fafc; padding: 14px; font-weight: 600; font-size: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .pattern-focus { font-size: 12px; color: var(--text-muted); font-weight: normal; margin-top: 2px; }
 
-        .metric-card {
-            background: var(--panel-bg);
-            padding: 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
+        .btn-toggle-blueprint { background: #e2e8f0; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #334155; cursor: pointer; }
+        .blueprint-panel { display: none; background: #fafafa; border-bottom: 1px solid var(--border-color); padding: 16px; font-size: 13px; }
+        .blueprint-section { margin-bottom: 12px; }
+        .blueprint-section strong { color: #1e3a8a; }
+        pre { background: #1e1e2e; color: #cdd6f4; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 12px; overflow-x: auto; margin: 6px 0 0 0; }
 
-        .metric-val {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 10px 14px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; font-size: 13.5px; }
+        .col-num { width: 4%; color: var(--text-muted); }
+        .col-name { width: 32%; font-weight: 500; }
+        .col-company { width: 22%; }
+        .col-link { width: 10%; }
+        .col-status { width: 16%; }
+        .col-insight { width: 16%; }
 
-        .metric-label {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-        }
+        .company-tag-wrapper { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+        .comp-tag { font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid #cbd5e1; text-transform: uppercase; background: #f8fafc; color: #475569; }
+        .comp-tag.gg { border-color: #fca5a5; background: #fef2f2; color: #b91c1c; }
+        .comp-tag.az { border-color: #fde047; background: #fef9c3; color: #a16207; }
+        .comp-tag.mt { border-color: #93c5fd; background: #eff6ff; color: #1d4ed8; }
+        .comp-tag.ms { border-color: #86efac; background: #f0fdf4; color: #15803d; }
+        .comp-tag.ap { border-color: #cbd5e1; background: #f1f5f9; color: #334155; }
+        .comp-tag.fk { border-color: #c084fc; background: #faf5ff; color: #7e22ce; }
 
-        /* Phase Section */
-        .phase-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1e40af;
-            margin: 32px 0 16px 0;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #d9e6f7;
-        }
+        .status-group { display: inline-flex; background: #f1f5f9; padding: 3px; border-radius: 20px; gap: 2px; }
+        .btn-status { border: none; background: transparent; cursor: pointer; width: 26px; height: 26px; border-radius: 50%; font-size: 11px; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: center; }
+        .btn-status.none { color: #475569; }
+        .btn-status.red { color: #ef4444; }
+        .btn-status.yellow { color: #d97706; }
+        .btn-status.green { color: #10b981; }
+        .btn-status.none.active { background: #64748b; color: #fff; }
+        .btn-status.red.active { background: var(--state-red); color: #fff; }
+        .btn-status.yellow.active { background: var(--state-yellow); color: #fff; }
+        .btn-status.green.active { background: var(--state-green); color: #fff; }
 
-        /* Pattern Accordion/Card */
-        .pattern-card {
-            background: var(--panel-bg);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 20px;
-            overflow: hidden;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-        }
-
-        .pattern-header {
-            background: #f1f5f9;
-            padding: 16px;
-            font-weight: 600;
-            font-size: 16px;
-            color: #334155;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .pattern-focus {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: normal;
-            margin-top: 4px;
-        }
-
-        /* Interactive Table */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            background: #f8fafc;
-            padding: 12px 16px;
-            font-size: 13px;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-        .col-num { width: 6%; color: var(--text-muted); font-weight: 500; }
-        .col-name { width: 40%; font-weight: 500; }
-        .col-link { width: 15%; }
-        .col-status { width: 24%; }
-        .col-insight { width: 15%; }
-
-        .lc-link {
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-family: monospace;
-            font-size: 13px;
-        }
-        .lc-link:hover { text-decoration: underline; }
-
-        /* Status Controls */
-        .status-group {
-            display: inline-flex;
-            background: #f1f5f9;
-            padding: 4px;
-            border-radius: 20px;
-            gap: 4px;
-        }
-
-        .btn-status {
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #fff;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .btn-status.none { background: #cbd5e1; color: #475569; }
-        .btn-status.red { background: #fee2e2; color: #ef4444; }
-        .btn-status.yellow { background: #fef3c7; color: #d97706; }
-        .btn-status.green { background: #d1fae5; color: #10b981; }
-
-        /* Active states when selected */
-        .btn-status.none.active { background: #64748b; color: #fff; transform: scale(1.1); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .btn-status.red.active { background: var(--state-red); color: #fff; transform: scale(1.1); box-shadow: 0 2px 4px rgba(239,68,68,0.3); }
-        .btn-status.yellow.active { background: var(--state-yellow); color: #fff; transform: scale(1.1); box-shadow: 0 2px 4px rgba(245,158,11,0.3); }
-        .btn-status.green.active { background: var(--state-green); color: #fff; transform: scale(1.1); box-shadow: 0 2px 4px rgba(16,185,129,0.3); }
-
-        .archetype-badge {
-            background: #eff6ff;
-            color: #1d4ed8;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 8px;
-            border: 1px solid #bfdbfe;
-            text-transform: uppercase;
-        }
-
-        /* Custom Input for Insights */
-        .insight-input {
-            width: 100%;
-            border: 1px solid var(--border-color);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            outline: none;
-            box-sizing: border-box;
-            transition: border 0.2s;
-        }
-        .insight-input:focus {
-            border-color: var(--accent-blue);
-            background: var(--accent-blue-light);
-        }
-
-        /* Persist Notice */
-        .backup-bar {
-            background: #fff7ed;
-            border: 1px solid #ffedd5;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 24px;
-            font-size: 14px;
-            color: #c2410c;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .btn-action {
-            background: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .btn-action:hover { background: #1d4ed8; }
+        .insight-input { width: 100%; border: 1px solid var(--border-color); padding: 5px 8px; border-radius: 6px; font-size: 12px; outline: none; box-sizing: border-box; }
+        .insight-input:focus { border-color: var(--accent-blue); background: var(--accent-blue-light); }
+        .archetype-badge { background: #eff6ff; color: #1d4ed8; font-size: 10px; font-weight: 700; padding: 1px 4px; border-radius: 4px; margin-left: 6px; border: 1px solid #bfdbfe; text-transform: uppercase; }
+        .backup-bar { font-size: 13px; background: #ebf8ff; border: 1px solid #bee3f8; padding: 10px; border-radius: 6px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-action { background: var(--accent-blue); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>DSA Master Roadmap Tracker</h1>
-        <div class="subtitle">Interactive Progress Dashboard • Local Storage Auto-Save Enabled</div>
-        
+        <h1>DSA Interactive Master Studio (Enterprise Edition)</h1>
+        <div class="subtitle">Complete 14-Pattern, Balanced 280-Question Company Target Matrix Matrix • Fully Interactive</div>
+
         <div class="backup-bar">
-            <span>💡 <strong>Tip:</strong> Your progress autosaves in your browser. Use the export/import tool to create backups or switch devices!</span>
+            <span>💾 <strong>Sync Strategy:</strong> Use backup extraction models periodically to save verification contexts across machine updates.</span>
             <div>
-                <button class="btn-action" onclick="exportBackup()">Export Backup JSON</button>
-                <button class="btn-action" style="background:#475569" onclick="importBackup()">Import Backup</button>
+                <button class="btn-action" onclick="exportBackup()">Export Progress</button>
+                <button class="btn-action" style="background:#475569" onclick="importBackup()">Import Progress</button>
             </div>
+        </div>
+
+        <div class="calendar-box">
+            <div class="calendar-title">🗓️ 60-Day Pacing Calendar Tracker (Tap to toggle completion status)</div>
+            <div class="calendar-grid" id="calendar-render-target"></div>
         </div>
 
         <div class="metrics-grid">
@@ -278,7 +139,7 @@
             </div>
             <div class="metric-card" style="border-top: 4px solid var(--state-yellow)">
                 <div class="metric-val" id="count-yellow" style="color: var(--state-yellow)">0</div>
-                <div class="metric-label">Yellow (Had to Peek)</div>
+                <div class="metric-label">Yellow (Peeked)</div>
             </div>
             <div class="metric-card" style="border-top: 4px solid var(--state-red)">
                 <div class="metric-val" id="count-red" style="color: var(--state-red)">0</div>
@@ -287,436 +148,502 @@
         </div>
     </header>
 
-    <div id="dashboard-content"></div>
+    <div id="studio-render-target"></div>
 </div>
 
 <script>
-// Complete raw data mapping of the 280 questions across 14 patterns directly parsed from the blueprint
-const dataset = [
+const studioDataset = [
     {
-        phase: "Phase 1: Linear Data Structures & Pointer Mechanics",
+        phase: "Phase 1: Linear Data Structures & Pointer Mechanics (Days 1 - 15)",
         patterns: [
             {
                 name: "Pattern 1: Arrays & Basic Math",
                 focus: "Prefix/Suffix tracking, running totals, Kadane’s algorithm, and in-place index manipulation.",
+                brute: "Nested loops re-scanning linear index spaces continuously (O(N²)).",
+                optimal: "Accumulate spatial states in a single iteration via extra references or prefix running counters (O(N)).",
+                java: `public int[] prefixSumTemplate(int[] nums) {\n    int[] prefix = new int[nums.length + 1];\n    for (int i = 0; i < nums.length; i++) prefix[i+1] = prefix[i] + nums[i];\n    return prefix;\n}`,
                 questions: [
-                    { id: "p1_1", name: "Two Sum", lc: "1", arch: true },
-                    { id: "p1_2", name: "Best Time to Buy and Sell Stock", lc: "121", arch: true },
-                    { id: "p1_3", name: "Maximum Subarray / Kadane's", lc: "53", arch: true },
-                    { id: "p1_4", name: "Product of Array Except Self", lc: "238", arch: true },
-                    { id: "p1_5", name: "Merge Intervals", lc: "56", arch: true },
-                    { id: "p1_6", name: "Move Zeroes", lc: "283" },
-                    { id: "p1_7", name: "Contains Duplicate", lc: "217" },
-                    { id: "p1_8", name: "Rotate Array", lc: "189" },
-                    { id: "p1_9", name: "Merge Sorted Array", lc: "88" },
-                    { id: "p1_10", name: "Majority Element", lc: "169" },
-                    { id: "p1_11", name: "Missing Number", lc: "268" },
-                    { id: "p1_12", name: "Find Pivot Index", lc: "724" },
-                    { id: "p1_13", name: "Subarray Sum Equals K", lc: "560" },
-                    { id: "p1_14", name: "Maximum Product Subarray", lc: "152" },
-                    { id: "p1_15", name: "Sort Colors / Dutch National Flag", lc: "75" },
-                    { id: "p1_16", name: "Set Matrix Zeroes", lc: "73" },
-                    { id: "p1_17", name: "Spiral Matrix", lc: "54" },
-                    { id: "p1_18", name: "Next Permutation", lc: "31" },
-                    { id: "p1_19", name: "Insert Interval", lc: "57" },
-                    { id: "p1_20", name: "Trapping Rain Water", lc: "42" }
+                    { id: "p1_1", name: "Two Sum", lc: "1", arch: true, tags: ["gg", "az", "mt", "ms"] },
+                    { id: "p1_2", name: "Best Time to Buy and Sell Stock", lc: "121", arch: true, tags: ["az", "ap", "gg"] },
+                    { id: "p1_3", name: "Maximum Subarray / Kadane's", lc: "53", arch: true, tags: ["ms", "az", "gg"] },
+                    { id: "p1_4", name: "Product of Array Except Self", lc: "238", arch: true, tags: ["az", "mt", "gg"] },
+                    { id: "p1_5", name: "Merge Intervals", lc: "56", arch: true, tags: ["mt", "gg", "az"] },
+                    { id: "p1_6", name: "Move Zeroes", lc: "283", tags: ["gg", "ap", "mt"] },
+                    { id: "p1_7", name: "Contains Duplicate", lc: "217", tags: ["az", "ap", "ms"] },
+                    { id: "p1_8", name: "Rotate Array", lc: "189", tags: ["az", "ms", "gg"] },
+                    { id: "p1_9", name: "Merge Sorted Array", lc: "88", tags: ["ms", "mt", "az"] },
+                    { id: "p1_10", name: "Majority Element", lc: "169", tags: ["gg", "az", "ms"] },
+                    { id: "p1_11", name: "Missing Number", lc: "268", tags: ["ms", "az", "gg"] },
+                    { id: "p1_12", name: "Find Pivot Index", lc: "724", tags: ["gg", "az"] },
+                    { id: "p1_13", name: "Subarray Sum Equals K", lc: "560", tags: ["gg", "mt", "az"] },
+                    { id: "p1_14", name: "Maximum Product Subarray", lc: "152", tags: ["az", "gg", "ms"] },
+                    { id: "p1_15", name: "Sort Colors / Dutch National Flag", lc: "75", tags: ["ms", "az", "gg"] },
+                    { id: "p1_16", name: "Set Matrix Zeroes", lc: "73", tags: ["fk", "ms"] },
+                    { id: "p1_17", name: "Spiral Matrix", lc: "54", tags: ["ms", "gg", "az"] },
+                    { id: "p1_18", name: "Next Permutation", lc: "31", tags: ["gg", "az", "mt"] },
+                    { id: "p1_19", name: "Insert Interval", lc: "57", tags: ["gg", "az", "ms"] },
+                    { id: "p1_20", name: "Trapping Rain Water", lc: "42", tags: ["gg", "az", "mt", "ap"] }
                 ]
             },
             {
                 name: "Pattern 2: Hashing",
                 focus: "Using HashMaps and HashSets to eliminate O(N²) loops and achieve O(1) lookups.",
+                brute: "Linear scans to search for complementary target values or past duplicates (O(N²)).",
+                optimal: "Log records dynamically inside a HashMap or HashSet to check complement visibility in true O(1) step constraints.",
+                java: `Map<Integer, Integer> map = new HashMap<>();\nfor (int num : nums) {\n    map.put(num, map.getOrDefault(num, 0) + 1);\n}`,
                 questions: [
-                    { id: "p2_1", name: "Group Anagrams", lc: "49", arch: true },
-                    { id: "p2_2", name: "Longest Consecutive Sequence", lc: "128", arch: true },
-                    { id: "p2_3", name: "Top K Frequent Elements", lc: "347", arch: true },
-                    { id: "p2_4", name: "Subarray Sum Equals K", lc: "560", arch: true },
-                    { id: "p2_5", name: "Valid Anagram", lc: "242" },
-                    { id: "p2_6", name: "Happy Number", lc: "202" },
-                    { id: "p2_7", name: "Isomorphic Strings", lc: "205" },
-                    { id: "p2_8", name: "Find All Duplicates in an Array", lc: "442" },
-                    { id: "p2_9", name: "Longest Substring Without Repeating Characters", lc: "3" },
-                    { id: "p2_10", name: "Minimum Window Substring", lc: "76" },
-                    { id: "p2_11", name: "Ransom Note", lc: "383" },
-                    { id: "p2_12", name: "Word Pattern", lc: "290" },
-                    { id: "p2_13", name: "Contains Nearby Duplicate II", lc: "219" },
-                    { id: "p2_14", name: "Find the Duplicate Number", lc: "287" },
-                    { id: "p2_15", name: "Sort Characters By Frequency", lc: "451" },
-                    { id: "p2_16", name: "First Unique Character in a String", lc: "387" },
-                    { id: "p2_17", name: "Intersection of Two Arrays", lc: "349" },
-                    { id: "p2_18", name: "Continuous Subarray Sum", lc: "523" },
-                    { id: "p2_19", name: "Brick Wall", lc: "554" },
-                    { id: "p2_20", name: "Insert Delete GetRandom O(1)", lc: "380" }
+                    { id: "p2_1", name: "Group Anagrams", lc: "49", arch: true, tags: ["mt", "az", "gg"] },
+                    { id: "p2_2", name: "Longest Consecutive Sequence", lc: "128", arch: true, tags: ["gg", "az", "ms"] },
+                    { id: "p2_3", name: "Top K Frequent Elements", lc: "347", arch: true, tags: ["az", "gg", "mt"] },
+                    { id: "p2_4", name: "Subarray Sum Equals K", lc: "560", arch: true, tags: ["gg", "mt", "az"] },
+                    { id: "p2_5", name: "Valid Anagram", lc: "242", tags: ["az", "gg"] },
+                    { id: "p2_6", name: "Happy Number", lc: "202", tags: ["gg", "ap"] },
+                    { id: "p2_7", name: "Isomorphic Strings", lc: "205", tags: ["gg", "az"] },
+                    { id: "p2_8", name: "Find All Duplicates in an Array", lc: "442", tags: ["az", "ms"] },
+                    { id: "p2_9", name: "Longest Substring Without Repeating Characters", lc: "3", tags: ["gg", "ms", "az"] },
+                    { id: "p2_10", name: "Minimum Window Substring", lc: "76", tags: ["gg", "mt", "az"] },
+                    { id: "p2_11", name: "Ransom Note", lc: "383", tags: ["ap", "mt"] },
+                    { id: "p2_12", name: "Word Pattern", lc: "290", tags: ["gg", "az"] },
+                    { id: "p2_13", name: "Contains Nearby Duplicate II", lc: "219", tags: ["gg", "ms"] },
+                    { id: "p2_14", name: "Find the Duplicate Number", lc: "287", tags: ["az", "gg"] },
+                    { id: "p2_15", name: "Sort Characters By Frequency", lc: "451", tags: ["gg", "az"] },
+                    { id: "p2_16", name: "First Unique Character in a String", lc: "387", tags: ["ms", "az"] },
+                    { id: "p2_17", name: "Intersection of Two Arrays", lc: "349", tags: ["gg", "mt"] },
+                    { id: "p2_18", name: "Continuous Subarray Sum", lc: "523", tags: ["mt", "gg"] },
+                    { id: "p2_19", name: "Brick Wall", lc: "554", tags: ["mt", "gg"] },
+                    { id: "p2_20", name: "Insert Delete GetRandom O(1)", lc: "380", tags: ["gg", "mt", "az"] }
                 ]
             },
             {
                 name: "Pattern 3: Two Pointers",
                 focus: "Moving pointers from opposite ends or at different pacing to optimize space to O(1).",
+                brute: "Permute all multi-index coordinate pairs to locate element matches (O(N²)).",
+                optimal: "Sort datasets initially, then move a left pointer forward and a right pointer backward to check combinations in O(1) space.",
+                java: `int left = 0, right = nums.length - 1;\nwhile (left < right) {\n    int sum = nums[left] + nums[right];\n    if (sum == target) return;\n    else if (sum < target) left++; else right--;\n}`,
                 questions: [
-                    { id: "p3_1", name: "3Sum", lc: "15", arch: true },
-                    { id: "p3_2", name: "Container With Most Water", lc: "11", arch: true },
-                    { id: "p3_3", name: "Trapping Rain Water", lc: "42", arch: true },
-                    { id: "p3_4", name: "Valid Palindrome", lc: "125" },
-                    { id: "p3_5", name: "Two Sum II - Input Array Is Sorted", lc: "167" },
-                    { id: "p3_6", name: "Remove Duplicates from Sorted Array", lc: "26" },
-                    { id: "p3_7", name: "Move Zeroes", lc: "283" },
-                    { id: "p3_8", name: "Squares of a Sorted Array", lc: "977" },
-                    { id: "p3_9", name: "Merge Sorted Array", lc: "88" },
-                    { id: "p3_10", name: "Sort Colors", lc: "75" },
-                    { id: "p3_11", name: "Backspace String Compare", lc: "844" },
-                    { id: "p3_12", name: "Boats to Save People", lc: "881" },
-                    { id: "p3_13", name: "Remove Element", lc: "27" },
-                    { id: "p3_14", name: "Reverse String", lc: "344" },
-                    { id: "p3_15", name: "Reverse Vowels of a String", lc: "345" },
-                    { id: "p3_16", name: "Partition Labels", lc: "763" },
-                    { id: "p3_17", name: "Minimum Size Subarray Sum", lc: "209" },
-                    { id: "p3_18", name: "4Sum", lc: "18" },
-                    { id: "p3_19", name: "Valid Palindrome II", lc: "680" },
-                    { id: "p3_20", name: "Assign Cookies", lc: "455" }
+                    { id: "p3_1", name: "3Sum", lc: "15", arch: true, tags: ["gg", "mt", "az", "ms"] },
+                    { id: "p3_2", name: "Container With Most Water", lc: "11", arch: true, tags: ["gg", "az", "mt"] },
+                    { id: "p3_3", name: "Trapping Rain Water", lc: "42", arch: true, tags: ["gg", "az", "mt", "ap"] },
+                    { id: "p3_4", name: "Valid Palindrome", lc: "125", tags: ["mt", "ms", "ap"] },
+                    { id: "p3_5", name: "Two Sum II - Input Array Is Sorted", lc: "167", tags: ["gg", "az"] },
+                    { id: "p3_6", name: "Remove Duplicates from Sorted Array", lc: "26", tags: ["ms", "mt", "az"] },
+                    { id: "p3_7", name: "Move Zeroes", lc: "283", tags: ["gg", "ap"] },
+                    { id: "p3_8", name: "Squares of a Sorted Array", lc: "977", tags: ["gg", "mt"] },
+                    { id: "p3_9", name: "Merge Sorted Array", lc: "88", tags: ["ms", "mt", "az"] },
+                    { id: "p3_10", name: "Sort Colors", lc: "75", tags: ["ms", "az"] },
+                    { id: "p3_11", name: "Backspace String Compare", lc: "844", tags: ["gg", "mt"] },
+                    { id: "p3_12", name: "Boats to Save People", lc: "881", tags: ["gg", "az"] },
+                    { id: "p3_13", name: "Remove Element", lc: "27", tags: ["ms", "az"] },
+                    { id: "p3_14", name: "Reverse String", lc: "344", tags: ["ap", "gg"] },
+                    { id: "p3_15", name: "Reverse Vowels of a String", lc: "345", tags: ["gg"] },
+                    { id: "p3_16", name: "Partition Labels", lc: "763", tags: ["az", "mt"] },
+                    { id: "p3_17", name: "Minimum Size Subarray Sum", lc: "209", tags: ["gg", "ms"] },
+                    { id: "p3_18", name: "4Sum", lc: "18", tags: ["gg", "az"] },
+                    { id: "p3_19", name: "Valid Palindrome II", lc: "680", tags: ["mt", "gg"] },
+                    { id: "p3_20", name: "Assign Cookies", lc: "455", tags: ["gg"] }
                 ]
             },
             {
                 name: "Pattern 4: Sliding Window",
                 focus: "Maintaining a contiguous block of memory that dynamically expands or shrinks based on constraints.",
+                brute: "Recompute state maps completely across every distinct nested subarray overlap (O(N · K)).",
+                optimal: "Expand a right boundary marker to add elements, then dynamically shrink a left boundary marker to maintain constraints in O(N).",
+                java: `int left = 0, maxLen = 0;\nfor (int right = 0; right < s.length(); right++) {\n    while (invalid) { left++; }\n    maxLen = Math.max(maxLen, right - left + 1);\n}`,
                 questions: [
-                    { id: "p4_1", name: "Longest Substring Without Repeating Characters", lc: "3", arch: true },
-                    { id: "p4_2", name: "Minimum Window Substring", lc: "76", arch: true },
-                    { id: "p4_3", name: "Sliding Window Maximum", lc: "239", arch: true },
-                    { id: "p4_4", name: "Maximum Sum Subarray of Size K", lc: "", url: "https://www.geeksforgeeks.org/problems/max-sum-subarray-of-size-k5313/1" },
-                    { id: "p4_5", name: "Permutation in String", lc: "567" },
-                    { id: "p4_6", name: "Longest Repeating Character Replacement", lc: "424" },
-                    { id: "p4_7", name: "Find All Anagrams in a String", lc: "438" },
-                    { id: "p4_8", name: "Fruits Into Baskets", lc: "904" },
-                    { id: "p4_9", name: "Binary Subarrays With Sum", lc: "930" },
-                    { id: "p4_10", name: "Subarrays with K Different Integers", lc: "992" },
-                    { id: "p4_11", name: "Max Consecutive Ones III", lc: "1004" },
-                    { id: "p4_12", name: "Minimum Size Subarray Sum", lc: "209" },
-                    { id: "p4_13", name: "Repeated DNA Sequences", lc: "187" },
-                    { id: "p4_14", name: "Substring with Concatenation of All Words", lc: "30" },
-                    { id: "p4_15", name: "Count Number of Nice Subarrays", lc: "1248" },
-                    { id: "p4_16", name: "K Radius Subarray Averages", lc: "2090" },
-                    { id: "p4_17", name: "Minimum Swaps to Group All 1's Together", lc: "1151" },
-                    { id: "p4_18", name: "Grumpy Bookstore Owner", lc: "1052" },
-                    { id: "p4_19", name: "Longest Substring with At Most K Distinct Characters", lc: "340" },
-                    { id: "p4_20", name: "Maximum Number of Vowels in a Substring", lc: "1456" }
+                    { id: "p4_1", name: "Longest Substring Without Repeating Characters", lc: "3", arch: true, tags: ["gg", "ms", "az"] },
+                    { id: "p4_2", name: "Minimum Window Substring", lc: "76", arch: true, tags: ["gg", "mt", "az"] },
+                    { id: "p4_3", name: "Sliding Window Maximum", lc: "239", arch: true, tags: ["az", "ap", "gg"] },
+                    { id: "p4_4", name: "Maximum Sum Subarray of Size K", lc: "", url: "https://leetcode.com/problems/maximum-sum-of-distinct-subarrays-with-length-k/", tags: ["az", "ms"] },
+                    { id: "p4_5", name: "Permutation in String", lc: "567", tags: ["ms", "gg"] },
+                    { id: "p4_6", name: "Longest Repeating Character Replacement", lc: "424", tags: ["gg", "az"] },
+                    { id: "p4_7", name: "Find All Anagrams in a String", lc: "438", tags: ["gg", "mt"] },
+                    { id: "p4_8", name: "Fruits Into Baskets", lc: "904", tags: ["gg", "az"] },
+                    { id: "p4_9", name: "Binary Subarrays With Sum", lc: "930", tags: ["gg", "mt"] },
+                    { id: "p4_10", name: "Subarrays with K Different Integers", lc: "992", tags: ["gg", "az"] },
+                    { id: "p4_11", name: "Max Consecutive Ones III", lc: "1004", tags: ["gg", "mt"] },
+                    { id: "p4_12", name: "Minimum Size Subarray Sum", lc: "209", tags: ["gg", "ms"] },
+                    { id: "p4_13", name: "Repeated DNA Sequences", lc: "187", tags: ["gg", "az"] },
+                    { id: "p4_14", name: "Substring with Concatenation of All Words", lc: "30", tags: ["gg", "ap"] },
+                    { id: "p4_15", name: "Count Number of Nice Subarrays", lc: "1248", tags: ["mt"] },
+                    { id: "p4_16", name: "K Radius Subarray Averages", lc: "2090", tags: ["gg"] },
+                    { id: "p4_17", name: "Minimum Swaps to Group All 1's Together", lc: "1151", tags: ["az"] },
+                    { id: "p4_18", name: "Grumpy Bookstore Owner", lc: "1052", tags: ["gg"] },
+                    { id: "p4_19", name: "Longest Substring with At Most K Distinct Characters", lc: "340", tags: ["gg", "az"] },
+                    { id: "p4_20", name: "Maximum Number of Vowels in a Substring", lc: "1456", tags: ["az"] }
                 ]
             }
         ]
     },
     {
-        phase: "Phase 2: Core Algorithmic Frameworks",
+        phase: "Phase 2: Core Algorithmic Frameworks (Days 16 - 30)",
         patterns: [
             {
                 name: "Pattern 5: Binary Search",
                 focus: "Halving search spaces in O(log N). Transitions from index bounds to searching optimal output parameters.",
+                brute: "Iterate from left to right to locate items or target threshold limits (O(N)).",
+                optimal: "Check the exact middle point, validate against the sorting constraint, and discard half the data space in O(log N).",
+                java: `int low = 0, high = nums.length - 1;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    if (nums[mid] == target) return mid;\n}`,
                 questions: [
-                    { id: "p5_1", name: "Search in Rotated Sorted Array", lc: "33", arch: true },
-                    { id: "p5_2", name: "Koko Eating Bananas", lc: "875", arch: true },
-                    { id: "p5_3", name: "Median of Two Sorted Arrays", lc: "4", arch: true },
-                    { id: "p5_4", name: "Binary Search", lc: "704" },
-                    { id: "p5_5", name: "Search Insert Position", lc: "35" },
-                    { id: "p5_6", name: "Find Minimum in Rotated Sorted Array", lc: "153" },
-                    { id: "p5_7", name: "First Bad Version", lc: "278" },
-                    { id: "p5_8", name: "Capacity To Ship Packages Within D Days", lc: "1011" },
-                    { id: "p5_9", name: "Peak Index in a Mountain Array", lc: "852" },
-                    { id: "p5_10", name: "Find Peak Element", lc: "162" },
-                    { id: "p5_11", name: "Search a 2D Matrix", lc: "74" },
-                    { id: "p5_12", name: "Guess Number Higher or Lower", lc: "374" },
-                    { id: "p5_13", name: "Split Array Largest Sum", lc: "410" },
-                    { id: "p5_14", name: "Aggressive Cows", lc: "", url: "https://www.geeksforgeeks.org/problems/aggressive-cows/1" },
-                    { id: "p5_15", name: "Single Element in a Sorted Array", lc: "540" },
-                    { id: "p5_16", name: "Find First and Last Position in Sorted Array", lc: "34" },
-                    { id: "p5_17", name: "Sqrt(x)", lc: "69" },
-                    { id: "p5_18", name: "Minimum Number of Days to Make Bouquets", lc: "1482" },
-                    { id: "p5_19", name: "Magnetic Force Between Two Balls", lc: "1552" },
-                    { id: "p5_20", name: "Find K Closest Elements", lc: "658" }
+                    { id: "p5_1", name: "Search in Rotated Sorted Array", lc: "33", arch: true, tags: ["mt", "ms", "gg", "az"] },
+                    { id: "p5_2", name: "Koko Eating Bananas", lc: "875", arch: true, tags: ["gg", "az"] },
+                    { id: "p5_3", name: "Median of Two Sorted Arrays", lc: "4", arch: true, tags: ["gg", "ms", "az"] },
+                    { id: "p5_4", name: "Binary Search", lc: "704", tags: ["az", "gg"] },
+                    { id: "p5_5", name: "Search Insert Position", lc: "35", tags: ["gg", "ms"] },
+                    { id: "p5_6", name: "Find Minimum in Rotated Sorted Array", lc: "153", tags: ["ms", "az"] },
+                    { id: "p5_7", name: "First Bad Version", lc: "278", tags: ["gg", "mt"] },
+                    { id: "p5_8", name: "Capacity To Ship Packages Within D Days", lc: "1011", tags: ["az", "gg"] },
+                    { id: "p5_9", name: "Peak Index in a Mountain Array", lc: "852", tags: ["gg", "az"] },
+                    { id: "p5_10", name: "Find Peak Element", lc: "162", tags: ["gg", "az", "ms"] },
+                    { id: "p5_11", name: "Search a 2D Matrix", lc: "74", tags: ["ms", "gg"] },
+                    { id: "p5_12", name: "Guess Number Higher or Lower", lc: "374", tags: ["gg"] },
+                    { id: "p5_13", name: "Split Array Largest Sum", lc: "410", tags: ["gg", "az"] },
+                    { id: "p5_14", name: "Aggressive Cows", lc: "", url: "https://www.geeksforgeeks.org/problems/aggressive-cows/1", tags: ["az", "fk"] },
+                    { id: "p5_15", name: "Single Element in a Sorted Array", lc: "540", tags: ["gg", "az"] },
+                    { id: "p5_16", name: "Find First and Last Position in Sorted Array", lc: "34", tags: ["gg", "ms"] },
+                    { id: "p5_17", name: "Sqrt(x)", lc: "69", tags: ["ms", "gg"] },
+                    { id: "p5_18", name: "Minimum Number of Days to Make Bouquets", lc: "1482", tags: ["gg", "az"] },
+                    { id: "p5_19", name: "Magnetic Force Between Two Balls", lc: "1552", tags: ["gg"] },
+                    { id: "p5_20", name: "Find K Closest Elements", lc: "658", tags: ["gg", "mt"] }
                 ]
             },
             {
                 name: "Pattern 6: Stacks & Queues",
                 focus: "LIFO/FIFO linear processing. Relies intensely on Monotonic Stacks to parse sequential configurations.",
+                brute: "Re-scan all future indices for each element to find the next greater value (O(N²)).",
+                optimal: "Push current index values to a Monotonic Stack; process smaller tracked elements instantly when a larger item arrives (O(N)).",
+                java: `Stack<Integer> st = new Stack<>();\nwhile (!st.isEmpty() && nums[i] > nums[st.peek()]) {\n    int idx = st.pop();\n}`,
                 questions: [
-                    { id: "p6_1", name: "Valid Parentheses", lc: "20", arch: true },
-                    { id: "p6_2", name: "Daily Temperatures", lc: "739", arch: true },
-                    { id: "p6_3", name: "Largest Rectangle in Histogram", lc: "84", arch: true },
-                    { id: "p6_4", name: "Min Stack", lc: "155" },
-                    { id: "p6_5", name: "Next Greater Element I", lc: "496" },
-                    { id: "p6_6", name: "Evaluate Reverse Polish Notation", lc: "150" },
-                    { id: "p6_7", name: "Asteroid Collision", lc: "735" },
-                    { id: "p6_8", name: "Decode String", lc: "394" },
-                    { id: "p6_9", name: "Remove K Digits", lc: "402" },
-                    { id: "p6_10", name: "Online Stock Span", lc: "901" },
-                    { id: "p6_11", name: "Simplify Path", lc: "71" },
-                    { id: "p6_12", name: "Car Fleet", lc: "853" },
-                    { id: "p6_13", name: "Basic Calculator", lc: "224" },
-                    { id: "p6_14", name: "Remove Duplicate Letters", lc: "316" },
+                    { id: "p6_1", name: "Valid Parentheses", lc: "20", arch: true, tags: ["az", "gg", "mt", "ms"] },
+                    { id: "p6_2", name: "Daily Temperatures", lc: "739", arch: true, tags: ["ms", "mt", "az"] },
+                    { id: "p6_3", name: "Largest Rectangle in Histogram", lc: "84", arch: true, tags: ["gg", "az", "ms"] },
+                    { id: "p6_4", name: "Min Stack", lc: "155", tags: ["ms", "az"] },
+                    { id: "p6_5", name: "Next Greater Element I", lc: "496", tags: ["az", "ms"] },
+                    { id: "p6_6", name: "Evaluate Reverse Polish Notation", lc: "150", tags: ["gg", "ms"] },
+                    { id: "p6_7", name: "Asteroid Collision", lc: "735", tags: ["gg", "az"] },
+                    { id: "p6_8", name: "Decode String", lc: "394", tags: ["gg", "az"] },
+                    { id: "p6_9", name: "Remove K Digits", lc: "402", tags: ["gg", "az"] },
+                    { id: "p6_10", name: "Online Stock Span", lc: "901", tags: ["az", "ms"] },
+                    { id: "p6_11", name: "Simplify Path", lc: "71", tags: ["mt", "ms"] },
+                    { id: "p6_12", name: "Car Fleet", lc: "853", tags: ["gg"] },
+                    { id: "p6_13", name: "Basic Calculator", lc: "224", tags: ["gg", "ms"] },
+                    { id: "p6_14", name: "Remove Duplicate Letters", lc: "316", tags: ["gg"] },
                     { id: "p6_15", name: "Score of Parentheses", lc: "856" },
-                    { id: "p6_16", name: "Sum of Subarray Minimums", lc: "907" },
-                    { id: "p6_17", name: "Next Greater Element II", lc: "503" },
-                    { id: "p6_18", name: "Maximal Rectangle", lc: "85" },
-                    { id: "p6_19", name: "Implement Queue using Stacks", lc: "232" },
-                    { id: "p6_20", name: "Implement Stack using Queues", lc: "225" }
+                    { id: "p6_16", name: "Sum of Subarray Minimums", lc: "907", tags: ["gg", "az"] },
+                    { id: "p6_17", name: "Next Greater Element II", lc: "503", tags: ["ms", "az"] },
+                    { id: "p6_18", name: "Maximal Rectangle", lc: "85", tags: ["gg", "ms"] },
+                    { id: "p6_19", name: "Implement Queue using Stacks", lc: "232", tags: ["ms", "az"] },
+                    { id: "p6_20", name: "Implement Stack using Queues", lc: "225", tags: ["ms", "gg"] }
                 ]
             },
             {
                 name: "Pattern 7: Intervals",
                 focus: "Sorting continuous spans of coordinates to process schedule collisions and range distributions.",
+                brute: "Compare every single interval coordinate against all others to find intersections (O(N²)).",
+                optimal: "Sort by start times, then make a single pass through the array, merging or resolving overlaps with the previous interval (O(N log N)).",
+                java: `Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));\n// Step-by-step overlap resolution`,
                 questions: [
-                    { id: "p7_1", name: "Merge Intervals", lc: "56", arch: true },
-                    { id: "p7_2", name: "Insert Interval", lc: "57", arch: true },
-                    { id: "p7_3", name: "Meeting Rooms II", lc: "253", arch: true },
-                    { id: "p7_4", name: "Non-overlapping Intervals", lc: "435" },
-                    { id: "p7_5", name: "Meeting Rooms", lc: "252" },
-                    { id: "p7_6", name: "Minimum Number of Arrows to Burst Balloons", lc: "452" },
-                    { id: "p7_7", name: "Interval List Intersections", lc: "986" },
-                    { id: "p7_8", name: "Video Stitching", lc: "1024" },
-                    { id: "p7_9", name: "Car Pooling", lc: "1094" },
-                    { id: "p7_10", name: "Employee Free Time", lc: "759" },
-                    { id: "p7_11", name: "Summary Ranges", lc: "228" },
-                    { id: "p7_12", name: "Divide Intervals Into Minimum Number of Groups", lc: "2406" },
-                    { id: "p7_13", name: "Amount of New Area Painted Each Day", lc: "2158" },
-                    { id: "p7_14", name: "My Calendar I", lc: "729" },
-                    { id: "p7_15", name: "My Calendar II", lc: "731" },
-                    { id: "p7_16", name: "Remove Covered Intervals", lc: "1288" },
-                    { id: "p7_17", name: "Merge Triplets to Form Target Triplet", lc: "1899" },
-                    { id: "p7_18", name: "Partition Labels", lc: "763" },
-                    { id: "p7_19", name: "Maximum Length of Pair of Chain", lc: "462" },
-                    { id: "p7_20", name: "Data Stream as Disjoint Intervals", lc: "352" }
+                    { id: "p7_1", name: "Merge Intervals", lc: "56", arch: true, tags: ["mt", "gg", "az"] },
+                    { id: "p7_2", name: "Insert Interval", lc: "57", arch: true, tags: ["gg", "az", "ms"] },
+                    { id: "p7_3", name: "Meeting Rooms II", lc: "253", arch: true, tags: ["az", "gg", "ms"] },
+                    { id: "p7_4", name: "Non-overlapping Intervals", lc: "435", tags: ["mt", "gg"] },
+                    { id: "p7_5", name: "Meeting Rooms", lc: "252", tags: ["mt", "az"] },
+                    { id: "p7_6", name: "Minimum Number of Arrows to Burst Balloons", lc: "452", tags: ["mt", "gg"] },
+                    { id: "p7_7", name: "Interval List Intersections", lc: "986", tags: ["mt", "az"] },
+                    { id: "p7_8", name: "Video Stitching", lc: "1024", tags: ["ap", "gg"] },
+                    { id: "p7_9", name: "Car Pooling", lc: "1094", tags: ["az"] },
+                    { id: "p7_10", name: "Employee Free Time", lc: "759", tags: ["gg", "az"] },
+                    { id: "p7_11", name: "Summary Ranges", lc: "228", tags: ["gg", "ms"] },
+                    { id: "p7_12", name: "Divide Intervals Into Minimum Number of Groups", lc: "2406", tags: ["az"] },
+                    { id: "p7_13", name: "Amount of New Area Painted Each Day", lc: "2158", tags: ["gg"] },
+                    { id: "p7_14", name: "My Calendar I", lc: "729", tags: ["gg", "az"] },
+                    { id: "p7_15", name: "My Calendar II", lc: "731", tags: ["gg"] },
+                    { id: "p7_16", name: "Remove Covered Intervals", lc: "1288", tags: ["gg"] },
+                    { id: "p7_17", name: "Merge Triplets to Form Target Triplet", lc: "1899", tags: ["mt"] },
+                    { id: "p7_18", name: "Partition Labels", lc: "763", tags: ["az", "mt"] },
+                    { id: "p7_19", name: "Maximum Length of Pair of Chain", lc: "462", tags: ["gg", "ms"] },
+                    { id: "p7_20", name: "Data Stream as Disjoint Intervals", lc: "352", tags: ["gg"] }
                 ]
             }
         ]
     },
     {
-        phase: "Phase 3: Linked Lists & Hierarchical Structures",
+        phase: "Phase 3: Linked Lists & Hierarchical Structures (Days 31 - 45)",
         patterns: [
             {
                 name: "Pattern 8: Linked Lists",
                 focus: "In-place pointer updates, layout isolation, and fast/slow iterative traversal boundaries.",
+                brute: "Copy all node values to an array, process them there, and recreate nodes (O(N) space complexity).",
+                optimal: "Modify pointer paths in place by keeping track of the current, previous, and next nodes (O(1) space complexity).",
+                java: `ListNode prev = null, curr = head;\nwhile (curr != null) {\n    ListNode next = curr.next; curr.next = prev; prev = curr; curr = next;\n}`,
                 questions: [
-                    { id: "p8_1", name: "Reverse Linked List", lc: "206", arch: true },
-                    { id: "p8_2", name: "Linked List Cycle", lc: "141", arch: true },
-                    { id: "p8_3", name: "LRU Cache", lc: "146", arch: true },
-                    { id: "p8_4", name: "Merge Two Sorted Lists", lc: "21" },
-                    { id: "p8_5", name: "Remove Nth Node From End of List", lc: "19" },
-                    { id: "p8_6", name: "Middle of the Linked List", lc: "876" },
-                    { id: "p8_7", name: "Reorder List", lc: "143" },
-                    { id: "p8_8", name: "Add Two Numbers", lc: "2" },
-                    { id: "p8_9", name: "Copy List with Random Pointer", lc: "138" },
-                    { id: "p8_10", name: "Reverse Nodes in k-Group", lc: "25" },
-                    { id: "p8_11", name: "Intersection of Two Linked Lists", lc: "160" },
-                    { id: "p8_12", name: "Merge k Sorted Lists", lc: "23" },
-                    { id: "p8_13", name: "Palindrome Linked List", lc: "234" },
-                    { id: "p8_14", name: "Rotate List", lc: "61" },
-                    { id: "p8_15", name: "Sort List", lc: "148" },
-                    { id: "p8_16", name: "Partition List", lc: "86" },
-                    { id: "p8_17", name: "Swap Nodes in Pairs", lc: "24" },
-                    { id: "p8_18", name: "Remove Duplicates from Sorted List", lc: "83" },
-                    { id: "p8_19", name: "Flatten a Multilevel Doubly Linked List", lc: "430" },
-                    { id: "p8_20", name: "Design Linked List", lc: "707" }
+                    { id: "p8_1", name: "Reverse Linked List", lc: "206", arch: true, tags: ["gg", "az", "ms"] },
+                    { id: "p8_2", name: "Linked List Cycle", lc: "141", arch: true, tags: ["az", "gg", "ms"] },
+                    { id: "p8_3", name: "LRU Cache", lc: "146", arch: true, tags: ["az", "fk", "ms", "gg"] },
+                    { id: "p8_4", name: "Merge Two Sorted Lists", lc: "21", tags: ["ms", "az", "gg"] },
+                    { id: "p8_5", name: "Remove Nth Node From End of List", lc: "19", tags: ["mt", "az"] },
+                    { id: "p8_6", name: "Middle of the Linked List", lc: "876", tags: ["az", "gg"] },
+                    { id: "p8_7", name: "Reorder List", lc: "143", tags: ["mt", "az"] },
+                    { id: "p8_8", name: "Add Two Numbers", lc: "2", tags: ["ms", "ap", "az"] },
+                    { id: "p8_9", name: "Copy List with Random Pointer", lc: "138", tags: ["ms", "az", "gg"] },
+                    { id: "p8_10", name: "Reverse Nodes in k-Group", lc: "25", tags: ["gg", "az", "ms"] },
+                    { id: "p8_11", name: "Intersection of Two Linked Lists", lc: "160", tags: ["az", "ms"] },
+                    { id: "p8_12", name: "Merge k Sorted Lists", lc: "23", tags: ["ms", "az", "gg"] },
+                    { id: "p8_13", name: "Palindrome Linked List", lc: "234", tags: ["mt", "ms"] },
+                    { id: "p8_14", name: "Rotate List", lc: "61", tags: ["ms", "az"] },
+                    { id: "p8_15", name: "Sort List", lc: "148", tags: ["gg", "ms"] },
+                    { id: "p8_16", name: "Partition List", lc: "86", tags: ["ms"] },
+                    { id: "p8_17", name: "Swap Nodes in Pairs", lc: "24", tags: ["ms", "az"] },
+                    { id: "p8_18", name: "Remove Duplicates from Sorted List", lc: "83", tags: ["ms", "az"] },
+                    { id: "p8_19", name: "Flatten a Multilevel Doubly Linked List", lc: "430", tags: ["ms", "az"] },
+                    { id: "p8_20", name: "Design Linked List", lc: "707", tags: ["gg", "ap"] }
                 ]
             },
             {
                 name: "Pattern 9: Trees & Binary Search Trees",
                 focus: "Evaluating isolated subtrees via deep recursive structures or breadth-first layered sweeps.",
+                brute: "Flattening tree nodes into lists or arrays just to run standard queries (O(N) space complexity).",
+                optimal: "Leverage call stack recursion (DFS) or level queues (BFS) to solve subproblems directly on the nodes.",
+                java: `Queue<TreeNode> q = new LinkedList<>(); q.add(root);\nwhile(!q.isEmpty()) { TreeNode curr = q.poll(); }`,
                 questions: [
-                    { id: "p9_1", name: "Invert Binary Tree", lc: "226", arch: true },
-                    { id: "p9_2", name: "Binary Tree Level Order Traversal", lc: "102", arch: true },
-                    { id: "p9_3", name: "Lowest Common Ancestor of a Binary Tree", lc: "236", arch: true },
-                    { id: "p9_4", name: "Serialize and Deserialize Binary Tree", lc: "297", arch: true },
-                    { id: "p9_5", name: "Maximum Depth of Binary Tree", lc: "104" },
-                    { id: "p9_6", name: "Same Tree", lc: "100" },
-                    { id: "p9_7", name: "Diameter of Binary Tree", lc: "543" },
-                    { id: "p9_8", name: "Balanced Binary Tree", lc: "110" },
-                    { id: "p9_9", name: "Validate Binary Search Tree", lc: "98" },
-                    { id: "p9_10", name: "Kth Smallest Element in a BST", lc: "230" },
-                    { id: "p9_11", name: "Binary Tree Right Side View", lc: "199" },
-                    { id: "p9_12", name: "Path Sum", lc: "112" },
-                    { id: "p9_13", name: "Construct Tree from Preorder/Inorder", lc: "105" },
-                    { id: "p9_14", name: "Subtree of Another Tree", lc: "572" },
-                    { id: "p9_15", name: "Binary Tree Zigzag Level Order Traversal", lc: "103" },
-                    { id: "p9_16", name: "Symmetric Tree", lc: "101" },
-                    { id: "p9_17", name: "Count Good Nodes in Binary Tree", lc: "1448" },
-                    { id: "p9_18", name: "Binary Tree Maximum Path Sum", lc: "124" },
-                    { id: "p9_19", name: "Vertical Order Traversal of a Binary Tree", lc: "987" },
-                    { id: "p9_20", name: "Populating Next Right Pointers in Node", lc: "116" }
+                    { id: "p9_1", name: "Invert Binary Tree", lc: "226", arch: true, tags: ["gg", "ap", "ms"] },
+                    { id: "p9_2", name: "Binary Tree Level Order Traversal", lc: "102", arch: true, tags: ["az", "ms", "gg"] },
+                    { id: "p9_3", name: "Lowest Common Ancestor of a Binary Tree", lc: "236", arch: true, tags: ["mt", "az", "gg"] },
+                    { id: "p9_4", name: "Serialize and Deserialize Binary Tree", lc: "297", arch: true, tags: ["gg", "mt"] },
+                    { id: "p9_5", name: "Maximum Depth of Binary Tree", lc: "104", tags: ["az", "ms"] },
+                    { id: "p9_6", name: "Same Tree", lc: "100", tags: ["ms", "az"] },
+                    { id: "p9_7", name: "Diameter of Binary Tree", lc: "543", tags: ["az", "ms"] },
+                    { id: "p9_8", name: "Balanced Binary Tree", lc: "110", tags: ["ap", "gg"] },
+                    { id: "p9_9", name: "Validate Binary Search Tree", lc: "98", tags: ["gg", "az", "ms"] },
+                    { id: "p9_10", name: "Kth Smallest Element in a BST", lc: "230", tags: ["gg", "az"] },
+                    { id: "p9_11", name: "Binary Tree Right Side View", lc: "199", tags: ["mt", "gg"] },
+                    { id: "p9_12", name: "Path Sum", lc: "112", tags: ["ms", "az"] },
+                    { id: "p9_13", name: "Construct Tree from Preorder/Inorder", lc: "105", tags: ["ms", "gg", "az"] },
+                    { id: "p9_14", name: "Subtree of Another Tree", lc: "572", tags: ["gg", "az"] },
+                    { id: "p9_15", name: "Binary Tree Zigzag Level Order Traversal", lc: "103", tags: ["ms", "az"] },
+                    { id: "p9_16", name: "Symmetric Tree", lc: "101", tags: ["ms", "gg"] },
+                    { id: "p9_17", name: "Count Good Nodes in Binary Tree", lc: "1448", tags: ["ms"] },
+                    { id: "p9_18", name: "Binary Tree Maximum Path Sum", lc: "124", tags: ["gg", "az"] },
+                    { id: "p9_19", name: "Vertical Order Traversal of a Binary Tree", lc: "987", tags: ["mt", "az"] },
+                    { id: "p9_20", name: "Populating Next Right Pointers in Node", lc: "116", tags: ["ms", "gg"] }
                 ]
             },
             {
                 name: "Pattern 10: Heaps & Priority Queues",
                 focus: "Extracting top extremes continuously out of dynamic data streams without resorting structures.",
+                brute: "Re-sorting entire lists with every insertion just to get the top or extreme values (O(N² log N)).",
+                optimal: "Use a min-heap or max-heap structure to automatically track extreme values in a fixed O(log K) space window.",
+                java: `PriorityQueue<Integer> minHeap = new PriorityQueue<>();\nminHeap.add(val); if(minHeap.size() > k) minHeap.poll();`,
                 questions: [
-                    { id: "p10_1", name: "Top K Frequent Elements", lc: "347", arch: true },
-                    { id: "p10_2", name: "Merge k Sorted Lists", lc: "23", arch: true },
-                    { id: "p10_3", name: "Find Median from Data Stream", lc: "295", arch: true },
-                    { id: "p10_4", name: "Kth Largest Element in an Array", lc: "215" },
-                    { id: "p10_5", name: "Task Scheduler", lc: "621" },
-                    { id: "p10_6", name: "K Closest Points to Origin", lc: "973" },
-                    { id: "p10_7", name: "Last Stone Weight", lc: "1046" },
-                    { id: "p10_8", name: "Reorganize String", lc: "767" },
-                    { id: "p10_9", name: "Smallest Range Covering Elements", lc: "632" },
-                    { id: "p10_10", name: "IPO", lc: "502" },
-                    { id: "p10_11", name: "Sliding Window Median", lc: "480" },
-                    { id: "p10_12", name: "Minimum Cost to Connect Sticks / Ropes", lc: "1167" },
-                    { id: "p10_13", name: "Furthest Building You Can Reach", lc: "1642" },
-                    { id: "p10_14", name: "Find K Pairs with Smallest Sums", lc: "373" },
-                    { id: "p10_15", name: "Employee Free Time", lc: "759" },
-                    { id: "p10_16", name: "Heap Sort Implementation", lc: "", url: "https://www.geeksforgeeks.org/heap-sort/" },
-                    { id: "p10_17", name: "Maximum Performance of a Team", lc: "1383" },
-                    { id: "p10_18", name: "Single-Threaded CPU", lc: "1834" },
-                    { id: "p10_19", name: "Constrained Subsequence Sum", lc: "1425" },
-                    { id: "p10_20", name: "Design Twitter", lc: "355" }
+                    { id: "p10_1", name: "Top K Frequent Elements", lc: "347", arch: true, tags: ["az", "gg", "mt"] },
+                    { id: "p10_2", name: "Merge k Sorted Lists", lc: "23", arch: true, tags: ["ms", "az", "gg"] },
+                    { id: "p10_3", name: "Find Median from Data Stream", lc: "295", arch: true, tags: ["gg", "mt"] },
+                    { id: "p10_4", name: "Kth Largest Element in an Array", lc: "215", tags: ["az", "fk", "gg"] },
+                    { id: "p10_5", name: "Task Scheduler", lc: "621", tags: ["mt", "az"] },
+                    { id: "p10_6", name: "K Closest Points to Origin", lc: "973", tags: ["az", "gg"] },
+                    { id: "p10_7", name: "Last Stone Weight", lc: "1046", tags: ["gg"] },
+                    { id: "p10_8", name: "Reorganize String", lc: "767", tags: ["gg", "az"] },
+                    { id: "p10_9", name: "Smallest Range Covering Elements", lc: "632", tags: ["gg", "az"] },
+                    { id: "p10_10", name: "IPO", lc: "502", tags: ["gg"] },
+                    { id: "p10_11", name: "Sliding Window Median", lc: "480", tags: ["gg", "ms"] },
+                    { id: "p10_12", name: "Minimum Cost to Connect Sticks / Ropes", lc: "1167", tags: ["az", "gg"] },
+                    { id: "p10_13", name: "Furthest Building You Can Reach", lc: "1642", tags: ["gg"] },
+                    { id: "p10_14", name: "Find K Pairs with Smallest Sums", lc: "373", tags: ["gg", "az"] },
+                    { id: "p10_15", name: "Employee Free Time", lc: "759", tags: ["gg", "az"] },
+                    { id: "p10_16", name: "Heap Sort Implementation", lc: "", url: "https://www.geeksforgeeks.org/heap-sort/", tags: ["ms", "fk"] },
+                    { id: "p10_17", name: "Maximum Performance of a Team", lc: "1383", tags: ["gg"] },
+                    { id: "p10_18", name: "Single-Threaded CPU", lc: "1834", tags: ["gg", "az"] },
+                    { id: "p10_19", name: "Constrained Subsequence Sum", lc: "1425", tags: ["gg"] },
+                    { id: "p10_20", name: "Design Twitter", lc: "355", tags: ["mt", "az"] }
                 ]
             }
         ]
     },
     {
-        phase: "Phase 4: Advanced Graphs & Combinatorics",
+        phase: "Phase 4: Advanced Graphs & Combinatorics (Days 46 - 60)",
         patterns: [
             {
                 name: "Pattern 11: Graphs",
                 focus: "Coordinating grid metrics, resolving cycle states with topological sorting, or tracking minimum path criteria.",
+                brute: "Permute or guess relationships between nodes without tracking visited states (leads to infinite cycles).",
+                optimal: "Track nodes with states (like unvisited, processing, done) and explore coordinates using a Queue or a Map.",
+                java: `Queue<int[]> q = new LinkedList<>(); q.add(new int[]{r, c});\nwhile(!q.isEmpty()) { /* Direction map calculations */ }`,
                 questions: [
-                    { id: "p11_1", name: "Number of Islands", lc: "200", arch: true },
-                    { id: "p11_2", name: "Course Schedule", lc: "207", arch: true },
-                    { id: "p11_3", name: "Rotting Oranges", lc: "994", arch: true },
-                    { id: "p11_4", name: "Network Delay Time", lc: "743", arch: true },
-                    { id: "p11_5", name: "Clone Graph", lc: "133" },
-                    { id: "p11_6", name: "Course Schedule II", lc: "210" },
-                    { id: "p11_7", name: "Pacific Atlantic Water Flow", lc: "417" },
-                    { id: "p11_8", name: "Word Ladder", lc: "127" },
-                    { id: "p11_9", name: "Graph Valid Tree", lc: "261" },
-                    { id: "p11_10", name: "Number of Connected Components", lc: "323" },
-                    { id: "p11_11", name: "Surrounded Regions", lc: "130" },
-                    { id: "p11_12", name: "Alien Dictionary", lc: "269" },
-                    { id: "p11_13", name: "Cheapest Flights Within K Stops", lc: "787" },
-                    { id: "p11_14", name: "Accounts Merge", lc: "721" },
-                    { id: "p11_15", name: "Is Graph Bipartite?", lc: "785" },
-                    { id: "p11_16", name: "Flood Fill", lc: "733" },
-                    { id: "p11_17", name: "Max Area of Island", lc: "695" },
-                    { id: "p11_18", name: "Walls and Gates", lc: "286" },
-                    { id: "p11_19", name: "Minimum Height Trees", lc: "310" },
-                    { id: "p11_20", name: "Redundant Connection", lc: "684" }
+                    { id: "p11_1", name: "Number of Islands", lc: "200", arch: true, tags: ["mt", "az", "gg"] },
+                    { id: "p11_2", name: "Course Schedule", lc: "207", arch: true, tags: ["az", "ms", "gg"] },
+                    { id: "p11_3", name: "Rotting Oranges", lc: "994", arch: true, tags: ["az", "ms", "gg"] },
+                    { id: "p11_4", name: "Network Delay Time", lc: "743", arch: true, tags: ["gg", "ms", "az"] },
+                    { id: "p11_5", name: "Clone Graph", lc: "133", tags: ["gg", "ms"] },
+                    { id: "p11_6", name: "Course Schedule II", lc: "210", tags: ["az", "gg"] },
+                    { id: "p11_7", name: "Pacific Atlantic Water Flow", lc: "417", tags: ["gg", "ap"] },
+                    { id: "p11_8", name: "Word Ladder", lc: "127", tags: ["mt", "gg"] },
+                    { id: "p11_9", name: "Graph Valid Tree", lc: "261", tags: ["gg", "mt"] },
+                    { id: "p11_10", name: "Number of Connected Components", lc: "323", tags: ["gg", "az"] },
+                    { id: "p11_11", name: "Surrounded Regions", lc: "130", tags: ["gg", "ms"] },
+                    { id: "p11_12", name: "Alien Dictionary", lc: "269", tags: ["gg", "mt"] },
+                    { id: "p11_13", name: "Cheapest Flights Within K Stops", lc: "787", tags: ["az", "gg"] },
+                    { id: "p11_14", name: "Accounts Merge", lc: "721", tags: ["mt", "gg"] },
+                    { id: "p11_15", name: "Is Graph Bipartite?", lc: "785", tags: ["gg", "ms"] },
+                    { id: "p11_16", name: "Flood Fill", lc: "733", tags: ["gg", "ms"] },
+                    { id: "p11_17", name: "Max Area of Island", lc: "695", tags: ["gg", "mt"] },
+                    { id: "p11_18", name: "Walls and Gates", lc: "286", tags: ["gg", "mt"] },
+                    { id: "p11_19", name: "Minimum Height Trees", lc: "310", tags: ["gg", "ms"] },
+                    { id: "p11_20", name: "Redundant Connection", lc: "684", tags: ["gg", "ms"] }
                 ]
             },
             {
                 name: "Pattern 12: Backtracking",
                 focus: "Generating structural state configurations exhaustively while backing out of invalid trajectories recursively.",
+                brute: "Generate every permutation blindly without validation, leading to massive memory leaks (O(N!)).",
+                optimal: "Choose an item, dive deeper recursively, and instantly remove that item (backtrack) to explore alternative choices efficiently.",
+                java: `private void backtrack(List<List<Integer>> res, List<Integer> temp, int start) {\n    res.add(new ArrayList<>(temp)); temp.remove(temp.size()-1);\n}`,
                 questions: [
-                    { id: "p12_1", name: "Subsets", lc: "78", arch: true },
-                    { id: "p12_2", name: "Combination Sum", lc: "39", arch: true },
-                    { id: "p12_3", name: "Generate Parentheses", lc: "22", arch: true },
-                    { id: "p12_4", name: "Permutations", lc: "46" },
-                    { id: "p12_5", name: "Word Search", lc: "79" },
-                    { id: "p12_6", name: "N-Queens", lc: "51" },
-                    { id: "p12_7", name: "Letter Combinations of a Phone Number", lc: "17" },
-                    { id: "p12_8", name: "Combination Sum II", lc: "40" },
-                    { id: "p12_9", name: "Palindrome Partitioning", lc: "131" },
-                    { id: "p12_10", name: "Restore IP Addresses", lc: "93" },
-                    { id: "p12_11", name: "Sudoku Solver", lc: "37" },
-                    { id: "p12_12", name: "Rat in a Maze", lc: "", url: "https://www.geeksforgeeks.org/problems/rat-in-a-maze-problem/1" },
-                    { id: "p12_13", name: "Expression Add Operators", lc: "282" },
-                    { id: "p12_14", name: "Partition to K Equal Sum Subsets", lc: "698" },
-                    { id: "p12_15", name: "Beautiful Arrangement", lc: "526" },
-                    { id: "p12_16", name: "Matchsticks to Square", lc: "473" },
-                    { id: "p12_17", name: "Gray Code", lc: "89" },
-                    { id: "p12_18", name: "Combinations", lc: "77" },
-                    { id: "p12_19", name: "Sequential Digits", lc: "1291" },
-                    { id: "p12_20", name: "Subsets II", lc: "90" }
+                    { id: "p12_1", name: "Subsets", lc: "78", arch: true, tags: ["ms", "gg", "az"] },
+                    { id: "p12_2", name: "Combination Sum", lc: "39", arch: true, tags: ["az", "gg"] },
+                    { id: "p12_3", name: "Generate Parentheses", lc: "22", arch: true, tags: ["gg", "ms", "az"] },
+                    { id: "p12_4", name: "Permutations", lc: "46", tags: ["gg", "az"] },
+                    { id: "p12_5", name: "Word Search", lc: "79", tags: ["ap", "mt", "gg"] },
+                    { id: "p12_6", name: "N-Queens", lc: "51", tags: ["gg", "ms"] },
+                    { id: "p12_7", name: "Letter Combinations of a Phone Number", lc: "17", tags: ["gg", "az"] },
+                    { id: "p12_8", name: "Combination Sum II", lc: "40", tags: ["az", "gg"] },
+                    { id: "p12_9", name: "Palindrome Partitioning", lc: "131", tags: ["gg", "mt"] },
+                    { id: "p12_10", name: "Restore IP Addresses", lc: "93", tags: ["gg", "ms"] },
+                    { id: "p12_11", name: "Sudoku Solver", lc: "37", tags: ["gg", "ms"] },
+                    { id: "p12_12", name: "Rat in a Maze", lc: "", url: "https://www.geeksforgeeks.org/problems/rat-in-a-maze-problem/1", tags: ["fk", "ms"] },
+                    { id: "p12_13", name: "Expression Add Operators", lc: "282", tags: ["gg"] },
+                    { id: "p12_14", name: "Partition to K Equal Sum Subsets", lc: "698", tags: ["gg", "mt"] },
+                    { id: "p12_15", name: "Beautiful Arrangement", lc: "526", tags: ["gg"] },
+                    { id: "p12_16", name: "Matchsticks to Square", lc: "473", tags: ["gg"] },
+                    { id: "p12_17", name: "Gray Code", lc: "89", tags: ["gg", "az"] },
+                    { id: "p12_18", name: "Combinations", lc: "77", tags: ["gg", "ms"] },
+                    { id: "p12_19", name: "Sequential Digits", lc: "1291", tags: ["az"] },
+                    { id: "p12_20", name: "Subsets II", lc: "90", tags: ["gg", "ms"] }
                 ]
-            }
-        ]
-    },
-    {
-        phase: "Phase 5: Dynamic Programming",
-        patterns: [
+            },
             {
                 name: "Pattern 13: 1D Dynamic Programming",
                 focus: "Breaking optimizations into single-array sub-problem trackers mapped linearly up to target parameter i.",
+                brute: "Standard top-down recursion that re-evaluates the same subproblems repeatedly over an exponential tree branch (O(2^N)).",
+                optimal: "Store previous solutions in a 1D cache array (tabulation), or use map memoization to solve dependencies in flat linear steps (O(N)).",
+                java: `int[] dp = new int[n + 1]; dp[0] = 1;\nfor(int i = 1; i <= n; i++) dp[i] += dp[i-coin];`,
                 questions: [
-                    { id: "p13_1", name: "Climbing Stairs", lc: "70", arch: true },
-                    { id: "p13_2", name: "Coin Change", lc: "322", arch: true },
-                    { id: "p13_3", name: "Longest Increasing Subsequence", lc: "300", arch: true },
-                    { id: "p13_4", name: "House Robber", lc: "198" },
-                    { id: "p13_5", name: "House Robber II", lc: "213" },
-                    { id: "p13_6", name: "Word Break", lc: "139" },
-                    { id: "p13_7", name: "Decode Ways", lc: "91" },
-                    { id: "p13_8", name: "Jump Game", lc: "55" },
-                    { id: "p13_9", name: "Partition Equal Subset Sum", lc: "416" },
-                    { id: "p13_10", name: "Target Sum", lc: "494" },
-                    { id: "p13_11", name: "Maximum Product Subarray", lc: "152" },
-                    { id: "p13_12", name: "Best Time to Buy and Sell Stock with Cooldown", lc: "309" },
-                    { id: "p13_13", name: "Frog Jump", lc: "403" },
-                    { id: "p13_14", name: "Min Cost Climbing Stairs", lc: "746" },
-                    { id: "p13_15", name: "Integer Break", lc: "343" },
-                    { id: "p13_16", name: "Combination Sum IV", lc: "377" },
-                    { id: "p13_17", name: "Perfect Squares", lc: "279" },
-                    { id: "p13_18", name: "Decode Ways II", lc: "639" },
-                    { id: "p13_19", name: "Longest Valid Parentheses", lc: "32" },
-                    { id: "p13_20", name: "0/1 Knapsack Problem", lc: "", url: "https://www.geeksforgeeks.org/problems/01-knapsack-problem0817/1" }
+                    { id: "p13_1", name: "Climbing Stairs", lc: "70", arch: true, tags: ["az", "ms", "gg"] },
+                    { id: "p13_2", name: "Coin Change", lc: "322", arch: true, tags: ["gg", "az", "ms"] },
+                    { id: "p13_3", name: "Longest Increasing Subsequence", lc: "300", arch: true, tags: ["az", "ms", "gg"] },
+                    { id: "p13_4", name: "House Robber", lc: "198", tags: ["ap", "ms"] },
+                    { id: "p13_5", name: "House Robber II", lc: "213", tags: ["ms", "gg"] },
+                    { id: "p13_6", name: "Word Break", lc: "139", tags: ["gg", "az", "ms"] },
+                    { id: "p13_7", name: "Decode Ways", lc: "91", tags: ["gg", "mt", "ms"] },
+                    { id: "p13_8", name: "Jump Game", lc: "55", tags: ["ms", "az", "gg"] },
+                    { id: "p13_9", name: "Partition Equal Subset Sum", lc: "416", tags: ["mt", "gg"] },
+                    { id: "p13_10", name: "Target Sum", lc: "494", tags: ["mt", "ms"] },
+                    { id: "p13_11", name: "Maximum Product Subarray", lc: "152", tags: ["az", "gg"] },
+                    { id: "p13_12", name: "Best Time to Buy and Sell Stock with Cooldown", lc: "309", tags: ["gg", "az"] },
+                    { id: "p13_13", name: "Frog Jump", lc: "403", tags: ["gg"] },
+                    { id: "p13_14", name: "Min Cost Climbing Stairs", lc: "746", tags: ["ms", "az"] },
+                    { id: "p13_15", name: "Integer Break", lc: "343", tags: ["gg"] },
+                    { id: "p13_16", name: "Combination Sum IV", lc: "377", tags: ["gg", "az"] },
+                    { id: "p13_17", name: "Perfect Squares", lc: "279", tags: ["gg"] },
+                    { id: "p13_18", name: "Decode Ways II", lc: "639", tags: ["gg"] },
+                    { id: "p13_19", name: "Longest Valid Parentheses", lc: "32", tags: ["gg", "ms"] },
+                    { id: "p13_20", name: "0/1 Knapsack Problem", lc: "", url: "https://www.geeksforgeeks.org/problems/01-knapsack-problem0817/1", tags: ["fk", "ms", "az"] }
                 ]
             },
             {
                 name: "Pattern 14: 2D/Multi-Dimensional Dynamic Programming",
                 focus: "Mapping multi-variable optimization arrays to balance overlap, edit steps, or grid constraints.",
+                brute: "Explore combinations across multiple dimensions recursively without caching states.",
+                optimal: "Construct a 2D matrix (`dp[i][j]`) to calculate step optimizations row by row or column by column.",
+                java: `int[][] dp = new int[m + 1][n + 1];\nif (s1.charAt(i-1) == s2.charAt(j-1)) dp[i][j] = dp[i-1][j-1] + 1;`,
                 questions: [
-                    { id: "p14_1", name: "Unique Paths", lc: "62", arch: true },
-                    { id: "p14_2", name: "Longest Common Subsequence", lc: "1143", arch: true },
-                    { id: "p14_3", name: "Edit Distance", lc: "72", arch: true },
-                    { id: "p14_4", name: "Unique Paths II", lc: "63" },
-                    { id: "p14_5", name: "Minimum Path Sum", lc: "64" },
-                    { id: "p14_6", name: "Palindromic Substrings", lc: "647" },
-                    { id: "p14_7", name: "Longest Palindromic Substring", lc: "5" },
-                    { id: "p14_8", name: "Burst Balloons", lc: "312" },
-                    { id: "p14_9", name: "Distinct Subsequences", lc: "115" },
-                    { id: "p14_10", name: "Regular Expression Matching", lc: "10" },
-                    { id: "p14_11", name: "Interleaving String", lc: "97" },
-                    { id: "p14_12", name: "Maximal Square", lc: "221" },
-                    { id: "p14_13", name: "Best Time to Buy and Sell Stock IV", lc: "188" },
-                    { id: "p14_14", name: "Minimum Insertion Steps to Make Palindrome", lc: "1312" },
-                    { id: "p14_15", name: "Triangle", lc: "120" },
-                    { id: "p14_16", name: "Wildcard Matching", lc: "44" },
-                    { id: "p14_17", name: "Cherry Pickup", lc: "741" },
-                    { id: "p14_18", name: "Dungeon Game", lc: "174" },
-                    { id: "p14_19", name: "Coin Change II", lc: "518" },
-                    { id: "p14_20", name: "Matrix Chain Multiplication", lc: "", url: "https://www.geeksforgeeks.org/problems/matrix-chain-multiplication0303/1" }
+                    { id: "p14_1", name: "Unique Paths", lc: "62", arch: true, tags: ["ms", "gg", "az"] },
+                    { id: "p14_2", name: "Longest Common Subsequence", lc: "1143", arch: true, tags: ["az", "gg", "ms"] },
+                    { id: "p14_3", name: "Edit Distance", lc: "72", arch: true, tags: ["gg", "ms", "az"] },
+                    { id: "p14_4", name: "Unique Paths II", lc: "63", tags: ["gg", "ms"] },
+                    { id: "p14_5", name: "Minimum Path Sum", lc: "64", tags: ["gg", "az"] },
+                    { id: "p14_6", name: "Palindromic Substrings", lc: "647", tags: ["mt", "gg"] },
+                    { id: "p14_7", name: "Longest Palindromic Substring", lc: "5", tags: ["ms", "gg", "az"] },
+                    { id: "p14_8", name: "Burst Balloons", lc: "312", tags: ["gg", "az"] },
+                    { id: "p14_9", name: "Distinct Subsequences", lc: "115", tags: ["mt", "gg"] },
+                    { id: "p14_10", name: "Regular Expression Matching", lc: "10", tags: ["gg", "mt"] },
+                    { id: "p14_11", name: "Interleaving String", lc: "97", tags: ["gg", "ms"] },
+                    { id: "p14_12", name: "Maximal Square", lc: "221", tags: ["gg", "ap"] },
+                    { id: "p14_13", name: "Best Time to Buy and Sell Stock IV", lc: "188", tags: ["gg", "az"] },
+                    { id: "p14_14", name: "Minimum Insertion Steps to Make Palindrome", lc: "1312", tags: ["gg"] },
+                    { id: "p14_15", name: "Triangle", lc: "120", tags: ["gg", "ap"] },
+                    { id: "p14_16", name: "Wildcard Matching", lc: "44", tags: ["gg", "ms"] },
+                    { id: "p14_17", name: "Cherry Pickup", lc: "741", tags: ["gg"] },
+                    { id: "p14_18", name: "Dungeon Game", lc: "174", tags: ["gg"] },
+                    { id: "p14_19", name: "Coin Change II", lc: "518", tags: ["gg", "az"] },
+                    { id: "p14_20", name: "Matrix Chain Multiplication", lc: "", url: "https://www.geeksforgeeks.org/problems/matrix-chain-multiplication0303/1", tags: ["ms", "fk"] }
                 ]
             }
         ]
     }
 ];
 
-// Local state
-let userProgress = {};
+const nameMap = { gg: "Google", az: "Amazon", mt: "Meta", ms: "Microsoft", ap: "Apple", fk: "Flipkart" };
+let userProgress = {}, calendarProgress = {};
 
-// Initialization
 function initDashboard() {
-    // Load from local Storage
-    const saved = localStorage.getItem('dsa_tracker_progress');
-    if (saved) {
-        try { userProgress = JSON.parse(saved); } catch(e) { userProgress = {}; }
-    }
+    const savedProgress = localStorage.getItem('studio_dsa_company_progress_280');
+    const savedCalendar = localStorage.getItem('studio_dsa_company_calendar_60');
+    if (savedProgress) try { userProgress = JSON.parse(savedProgress); } catch(e) {}
+    if (savedCalendar) try { calendarProgress = JSON.parse(savedCalendar); } catch(e) {}
 
-    const container = document.getElementById('dashboard-content');
+    renderCalendar();
+    renderMainGrid();
+    calculateMetrics();
+}
+
+function renderCalendar() {
+    const container = document.getElementById('calendar-render-target');
+    let html = "";
+    for (let day = 1; day <= 60; day++) {
+        let activeClass = day <= 15 ? "active-linear" : day <= 30 ? "active-framework" : day <= 45 ? "active-tree" : "active-adv";
+        if (calendarProgress[day]) activeClass = "completed";
+        html += `<div class="day-badge ${activeClass}" id="cal-day-${day}" onclick="toggleCalendarDay(${day})">Day ${day}</div>`;
+    }
+    container.innerHTML = html;
+}
+
+function toggleCalendarDay(dayNum) {
+    calendarProgress[dayNum] = !calendarProgress[dayNum];
+    localStorage.setItem('studio_dsa_company_calendar_60', JSON.stringify(calendarProgress));
+    initDashboard();
+}
+
+function renderMainGrid() {
+    const container = document.getElementById('studio-render-target');
     let htmlStr = "";
 
-    dataset.forEach(phaseBlock => {
+    studioDataset.forEach(phaseBlock => {
         htmlStr += `<div class="phase-title">${phaseBlock.phase}</div>`;
-        
-        phaseBlock.patterns.forEach(pattern => {
+        phaseBlock.patterns.forEach((pattern, patIdx) => {
+            const uniquePatId = `panel-pat-${phaseBlock.phase.replace(/[^a-zA-Z0-9]/g, '')}-${patIdx}`;
             htmlStr += `
                 <div class="pattern-card">
                     <div class="pattern-header">
                         <div>
                             <div>${pattern.name}</div>
-                            <div class="pattern-focus">${pattern.focus}</div>
+                            <div class="pattern-focus">🎯 Concept Target: ${pattern.focus}</div>
                         </div>
+                        <button class="btn-toggle-blueprint" onclick="toggleBlueprintPanel('${uniquePatId}')">Toggle Java Strategy</button>
                     </div>
+                    
+                    <div class="blueprint-panel" id="${uniquePatId}">
+                        <div class="blueprint-section"><strong>Naive Strategy:</strong> ${pattern.brute}</div>
+                        <div class="blueprint-section"><strong>Optimal Pattern Pivot:</strong> ${pattern.optimal}</div>
+                        <div class="blueprint-section"><strong>Core Java Setup Syntax:</strong><pre>${pattern.java}</pre></div>
+                    </div>
+
                     <table>
                         <thead>
                             <tr>
                                 <th class="col-num">#</th>
-                                <th class="col-name">Problem Name</th>
+                                <th class="col-name">Problem Variant</th>
+                                <th class="col-company">Verified Company Frequency Target</th>
                                 <th class="col-link">Code Link</th>
-                                <th class="col-status">Status Control (None / Stuck / Review / Done)</th>
+                                <th class="col-status">Status Control</th>
                                 <th class="col-insight">Your Key Insight Token</th>
                             </tr>
                         </thead>
@@ -729,10 +656,14 @@ function initDashboard() {
                 const url = q.lc ? `https://leetcode.com/problems/${q.name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, '-')}/` : q.url;
                 const displayLink = q.lc ? `LeetCode ${q.lc}` : 'GFG Link';
 
+                let tagsHtml = "";
+                if(q.tags) q.tags.forEach(t => { tagsHtml += `<span class="comp-tag ${t}">${nameMap[t]}</span>`; });
+
                 htmlStr += `
                     <tr id="row-${q.id}">
                         <td class="col-num">${idx + 1}</td>
                         <td class="col-name">${q.name}${badge}</td>
+                        <td class="col-company"><div class="company-tag-wrapper">${tagsHtml}</div></td>
                         <td class="col-link"><a class="lc-link" href="${url}" target="_blank">${displayLink}</a></td>
                         <td class="col-status">
                             <div class="status-group">
@@ -743,96 +674,81 @@ function initDashboard() {
                             </div>
                         </td>
                         <td class="col-insight">
-                            <input type="text" class="insight-input" placeholder="Core trick phrase..." value="${state.insight || ''}" onchange="setInsight('${q.id}', this.value)">
+                            <input type="text" class="insight-input" placeholder="Plain English formula..." value="${state.insight || ''}" onchange="setInsight('${q.id}', this.value)">
                         </td>
                     </tr>
                 `;
             });
-
-            htmlStr += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
+            htmlStr += `</tbody></table></div>`;
         });
     });
-
     container.innerHTML = htmlStr;
-    calculateMetrics();
 }
 
-function setStatus(qId, statusValue) {
-    if (!userProgress[qId]) {
-        userProgress[qId] = { status: 'none', insight: '' };
-    }
-    userProgress[qId].status = statusValue;
-    
-    // Update button active classes dynamically inside row panel
-    const row = document.getElementById(`row-${qId}`);
-    const buttons = row.querySelectorAll('.btn-status');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    row.querySelector(`.btn-status.${statusValue}`).classList.add('active');
+function toggleBlueprintPanel(panelId) {
+    const p = document.getElementById(panelId);
+    p.style.display = p.style.display === "block" ? "none" : "block";
+}
 
+function setStatus(qId, val) {
+    if (!userProgress[qId]) userProgress[qId] = { status: 'none', insight: '' };
+    userProgress[qId].status = val;
     saveState();
+    const row = document.getElementById(`row-${qId}`);
+    row.querySelectorAll('.btn-status').forEach(b => b.classList.remove('active'));
+    row.querySelector(`.btn-status.${val}`).classList.add('active');
 }
 
-function setInsight(qId, textValue) {
-    if (!userProgress[qId]) {
-        userProgress[qId] = { status: 'none', insight: '' };
-    }
-    userProgress[qId].insight = textValue;
+function setInsight(qId, val) {
+    if (!userProgress[qId]) userProgress[qId] = { status: 'none', insight: '' };
+    userProgress[qId].insight = val;
     saveState();
 }
 
 function saveState() {
-    localStorage.setItem('dsa_tracker_progress', JSON.stringify(userProgress));
+    localStorage.setItem('studio_dsa_company_progress_280', JSON.stringify(userProgress));
     calculateMetrics();
 }
 
 function calculateMetrics() {
-    let green = 0, yellow = 0, red = 0;
-    
-    Object.keys(userProgress).forEach(key => {
-        if (userProgress[key].status === 'green') green++;
-        if (userProgress[key].status === 'yellow') yellow++;
-        if (userProgress[key].status === 'red') red++;
+    let g = 0, y = 0, r = 0;
+    Object.keys(userProgress).forEach(k => {
+        if (userProgress[k].status === 'green') g++;
+        if (userProgress[k].status === 'yellow') y++;
+        if (userProgress[k].status === 'red') r++;
     });
-
-    const totalSolved = green + yellow; // Done + Review counted toward baseline targets
-    document.getElementById('count-total').innerText = `${totalSolved} / 280`;
-    document.getElementById('count-green').innerText = green;
-    document.getElementById('count-yellow').innerText = yellow;
-    document.getElementById('count-red').innerText = red;
+    document.getElementById('count-total').innerText = `${g+y} / 280`;
+    document.getElementById('count-green').innerText = g;
+    document.getElementById('count-yellow').innerText = y;
+    document.getElementById('count-red').innerText = r;
 }
 
 function exportBackup() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userProgress));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "dsa_roadmap_progress_backup.json");
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+    const wrapper = { progress: userProgress, calendar: calendarProgress };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(wrapper));
+    const a = document.createElement('a');
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", "dsa_company_matrix_autosave.json");
+    document.body.appendChild(a); a.click(); a.remove();
 }
 
 function importBackup() {
-    const rawJSON = prompt("Paste your exported JSON data text here:");
+    const rawJSON = prompt("Paste backup JSON configuration text:");
     if (rawJSON) {
         try {
             const parsed = JSON.parse(rawJSON);
-            userProgress = parsed;
-            saveState();
-            initDashboard();
-            alert("Backup imported successfully!");
-        } catch(e) {
-            alert("Invalid backup string structure! Please verify data format.");
-        }
+            if(parsed.progress && parsed.calendar) {
+                userProgress = parsed.progress; calendarProgress = parsed.calendar;
+                localStorage.setItem('studio_dsa_company_progress_280', JSON.stringify(userProgress));
+                localStorage.setItem('studio_dsa_company_calendar_60', JSON.stringify(calendarProgress));
+                initDashboard();
+                alert("Progress successfully synced!");
+            }
+        } catch(e) { alert("Invalid backup data format context."); }
     }
 }
 
-// Start everything up on execution
 initDashboard();
 </script>
-
 </body>
 </html>
